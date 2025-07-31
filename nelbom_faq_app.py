@@ -1,6 +1,4 @@
-
 import streamlit as st
-import difflib
 
 st.set_page_config(page_title="늘봄지원실 FAQ 자동응답", page_icon="🤖", layout="centered")
 
@@ -9,9 +7,7 @@ st.title("📚 늘봄지원실 FAQ 자동응답 챗봇")
 st.markdown(
     """
     **사용 방법**  
-    1. 상단에서 **질문 입력 방법**을 선택하세요.  
-    2. *드롭다운*을 선택하면 준비된 질문 목록에서 고를 수 있고, *직접 질문 입력*을 선택하면 자유롭게 질문을 입력할 수 있습니다.  
-    3. 질문에 맞는 답변이 화면에 표시됩니다.  
+    아래 드롭다운에서 궁금한 질문을 선택하면, 자동으로 답변을 제공합니다.  
 
     ℹ️ 신규 질문은 GitHub 이슈로 남겨주세요!
     """
@@ -27,32 +23,15 @@ FAQ_DICT = {
 }
 
 # ----------------------------------------------------------------------------
-mode = st.radio("질문 입력 방법을 선택하세요:", ("드롭다운에서 선택", "직접 질문 입력"), horizontal=True)
+selected_question = st.selectbox(
+    "질문을 선택하세요:",
+    list(FAQ_DICT.keys()),
+    index=None,
+    placeholder="질문을 골라주세요…"
+)
 
-if mode == "드롭다운에서 선택":
-    selected_question = st.selectbox(
-        "질문을 선택하세요:",
-        list(FAQ_DICT.keys()),
-        index=None,
-        placeholder="질문을 골라주세요…"
-    )
-    if selected_question:
-        st.success(FAQ_DICT[selected_question])
-else:
-    user_question = st.text_input("질문을 입력하세요:")
-    if user_question:
-        # 1차: 포함 검색
-        match_key = next((q for q in FAQ_DICT if q in user_question), None)
-
-        # 2차: 유사도 검색
-        if not match_key:
-            candidates = difflib.get_close_matches(user_question, FAQ_DICT.keys(), n=1, cutoff=0.6)
-            match_key = candidates[0] if candidates else None
-
-        if match_key:
-            st.success(FAQ_DICT[match_key])
-        else:
-            st.info("죄송합니다. 해당 질문에 대한 답변을 아직 준비하지 못했습니다. 담당자에게 문의해주세요.")
+if selected_question:
+    st.success(FAQ_DICT[selected_question])
 
 # 푸터 ----------------------------------------------------------------------
 st.divider()
